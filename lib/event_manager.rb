@@ -37,20 +37,25 @@ def clean_phone_number(phone_number)
   cleaned_numbers = phone_number.gsub(/\D/, '')
 
   if cleaned_numbers.length < 10 || cleaned_numbers.length > 11
-    p "The phone number is invalid"
+    return nil
   elsif cleaned_numbers.length == 11 && cleaned_numbers[0] == "1"
-    cleaned_numbers = cleaned_numbers[1..-1]
+    cleaned_numbers = format_phone_number(cleaned_numbers[1..-1])
 
   elsif cleaned_numbers.length == 10
-    return cleaned_numbers
+    return format_phone_number(cleaned_numbers)
   end
 
-#   # If the phone number is less than 10 digits, assume that it is a bad number
-#   # If the phone number is 10 digits, assume that it is good
-#   # If the phone number is 11 digits and the first number is 1, trim the 1 and use the remaining 10 digits
-#   # If the phone number is 11 digits and the first number is not 1, then it is a bad number
-#   # If the phone number is more than 11 digits, assume that it is a bad number
+end
 
+def format_phone_number(phone_number)
+  splitted = phone_number.split('')
+  area_code = splitted[0..2].join
+  three_first = splitted[3..5].join
+  last_four = splitted.last(4).join
+
+  formatted = "(#{area_code}) #{three_first}-#{last_four}"
+
+  return formatted
 end
 
 puts 'EventManager initialized.'
@@ -72,7 +77,7 @@ contents.each do |row|
   zipcode = clean_zipcode(row[:zipcode])
   legislators = legislators_by_zipcode(zipcode)
 
-  # form_letter = erb_template.result(binding)
+  form_letter = erb_template.result(binding)
 
-  # save_thank_you_letter(id,form_letter)
+  save_thank_you_letter(id,form_letter)
 end

@@ -12,6 +12,16 @@
     Please consider reaching out to your following representatives:
   </p>
 
+  <% if number.nil? %>
+  <p>
+    You entered an invalid phone number, we won't be able to reach you
+  </p>
+  <% else %>
+  <p>
+    We will reach out to this number <%= number %> in case we need to
+  </p>
+  <% end %>
+
   <table>
     <% if legislators.kind_of?(Array) %>
       <th>Name</th><th>Website</th>
