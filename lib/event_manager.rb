@@ -2,6 +2,7 @@ require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
 require 'pry-byebug'
+require 'time'
 
 def clean_zipcode(zipcode)
   zipcode.to_s.rjust(5,"0")[0..4]
@@ -66,18 +67,47 @@ contents = CSV.open(
   header_converters: :symbol
 )
 
+
+def registration_frequency(contents)
+
+  time_frequency = contents.reduce(Hash.new(0)) do |result, row|
+
+    date = row[:regdate]
+
+    only_time = Time.strptime(date, "%m/%d/%y %H:%M").strftime("%H")
+
+    result[only_time] += 1
+
+    result
+
+  end
+
+  most_repeated_time = time_frequency.values.max
+
+  times_with_most_frequency = time_frequency.select { |time, frequency| frequency == most_repeated_time}
+
+  puts times_with_most_frequency
+
+end
+
+
+
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
 
+registration_frequency(contents)
 
 contents.each do |row|
+
   id = row[0]
   name = row[:first_name]
   number = clean_phone_number(row[:homephone])
   zipcode = clean_zipcode(row[:zipcode])
+
   legislators = legislators_by_zipcode(zipcode)
 
-  form_letter = erb_template.result(binding)
+  # form_letter = erb_template.result(binding)
 
-  save_thank_you_letter(id,form_letter)
+  # save_thank_you_letter(id,form_letter)
+
 end
