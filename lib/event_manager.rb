@@ -70,6 +70,12 @@ contents = CSV.open(
 
 def registration_time_frequency(contents)
 
+  contents = CSV.open(
+  'event_attendees.csv',
+  headers: true,
+  header_converters: :symbol
+  )
+
   time_frequency = contents.reduce(Hash.new(0)) do |result, row|
 
     date = row[:regdate]
@@ -86,11 +92,19 @@ def registration_time_frequency(contents)
 
   times_with_most_frequency = time_frequency.select { |time, frequency| frequency == most_repeated_time}
 
-  puts times_with_most_frequency
+  puts "The times with the most registration frequency are: #{times_with_most_frequency}"
 
 end
 
+
+
 def registration_day_frequency(contents)
+
+  contents = CSV.open(
+    'event_attendees.csv',
+    headers: true,
+    header_converters: :symbol
+    )
 
   day_frequency = contents.reduce(Hash.new(0)) do |result, row|
 
@@ -103,7 +117,6 @@ def registration_day_frequency(contents)
     result
 
   end
-
 
   most_repeated_day = day_frequency.values.max
 
@@ -119,20 +132,18 @@ def registration_day_frequency(contents)
     6 => "Sunday"
   }
 
-  days_with_most_frequency_with_names = days_with_most_frequency.transform_keys { |key| day_names[key]}
+  days_with_most_frequency_with_names = days_with_most_frequency.transform_keys { |key| day_names[key] }
 
   puts "The day with most frequency is: #{days_with_most_frequency_with_names}"
 
-
-
-
 end
+
+registration_time_frequency(contents)
+registration_day_frequency(contents)
+
 
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
-
-# registration_time_frequency(contents)
-registration_day_frequency(contents)
 
 contents.each do |row|
 
