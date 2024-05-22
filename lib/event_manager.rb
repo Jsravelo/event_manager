@@ -68,7 +68,7 @@ contents = CSV.open(
 )
 
 
-def registration_frequency(contents)
+def registration_time_frequency(contents)
 
   time_frequency = contents.reduce(Hash.new(0)) do |result, row|
 
@@ -90,12 +90,49 @@ def registration_frequency(contents)
 
 end
 
+def registration_day_frequency(contents)
 
+  day_frequency = contents.reduce(Hash.new(0)) do |result, row|
+
+    date = row[:regdate]
+
+    only_day = Date.strptime(date, "%m/%d/%y %H:%M").wday
+
+    result[only_day] += 1
+
+    result
+
+  end
+
+
+  most_repeated_day = day_frequency.values.max
+
+  days_with_most_frequency = day_frequency.select { |day, frequency| frequency == most_repeated_day}
+
+  day_names = {
+    0 => "Monday",
+    1 => "Tuesday",
+    2 => "Wednesday",
+    3 => "Thursday",
+    4 => "Friday",
+    5 => "Saturday",
+    6 => "Sunday"
+  }
+
+  days_with_most_frequency_with_names = days_with_most_frequency.transform_keys { |key| day_names[key]}
+
+  puts "The day with most frequency is: #{days_with_most_frequency_with_names}"
+
+
+
+
+end
 
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
 
-registration_frequency(contents)
+# registration_time_frequency(contents)
+registration_day_frequency(contents)
 
 contents.each do |row|
 
@@ -106,8 +143,8 @@ contents.each do |row|
 
   legislators = legislators_by_zipcode(zipcode)
 
-  # form_letter = erb_template.result(binding)
+  form_letter = erb_template.result(binding)
 
-  # save_thank_you_letter(id,form_letter)
+  save_thank_you_letter(id,form_letter)
 
 end
